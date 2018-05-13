@@ -2,8 +2,18 @@
 <html lang="en">
 	<head>
 		<title>Voxel Landscape Renderer</title>
+		<style>
+			body {
+				margin: 0;
+			}
+		</style>
+		<script type="module">
+			import main from './js/main.js';
+			// run the main method once the DOM is loaded
+			window.addEventListener('load', main);
+		</script>
 	</head>
 	<body>
-		<p>TO DO</p>
+		<canvas id="canvas" width="500" height="400"></canvas>
 	</body>
 </html>

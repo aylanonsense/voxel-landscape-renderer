@@ -1,0 +1,18 @@
+NOTES DURING MY STUDY OF WEBGL2
+===============================
+
+Taken from https://webgl2fundamentals.org/
+
+A WebGL program is the combination of two things:
+	A vertex shader, that computes vertex positions and can rasterize primitives
+	A fragment shader, that compute a color for each pixel of a primitive
+
+We can send the GPU data in any of the following ways:
+	Buffers: arrays of binary data accessed in sequence
+	Attributes: GPU input variables whose values are read in from buffers
+	Vertex Array Object: the combined state of attributes and the buffers they read from
+	Uniforms: global variables
+	Textures: arrays of data that can be randomly accessed
+	Varying: variables passed from the vertex shader to the fragment shader
+
+
