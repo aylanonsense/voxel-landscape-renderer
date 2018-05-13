@@ -1,0 +1,13 @@
+{
+  "name": "voxel-landscape-renderer",
+  "version": "0.0.1",
+  "description": "A tool for rendering voxel landscapes.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bridgs/voxel-landscape-renderer.git"
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
