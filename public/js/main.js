@@ -1,6 +1,7 @@
 import { vertexShaderSource, fragmentShaderSource } from './shaders.js';
 import createShader from './gl/createShader.js';
 import createProgram from './gl/createProgram.js';
+import mat4 from './matrix/mat4.js';
 
 export default () => {
 	const canvas = document.getElementById('canvas');
@@ -19,8 +20,8 @@ export default () => {
 	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 	let positions = [
 		0, 0,
-		0, 0.5,
-		0.7, 0,
+		0, 100,
+		140, 0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 	let vao = gl.createVertexArray();
@@ -34,9 +35,22 @@ export default () => {
 	gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	gl.clearColor(0, 0, 0, 0);
-	gl.clear(gl.COLOR_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.useProgram(program);
 	gl.bindVertexArray(vao);
+	gl.enable(gl.CULL_FACE);
+	gl.enable(gl.DEPTH_TEST);
+
+	let matrix = mat4.ortho(0, gl.canvas.clientWidth, gl.canvas.clientHeight, 0, 400, -400);
+	// matrix = mat4.translate(matrix, 10, 0, 0);
+	// matrix = mat4.rotateX(matrix, 0);
+	// matrix = mat4.rotateY(matrix, 0);
+	// matrix = mat4.rotateZ(matrix, 0);
+	// matrix = mat4.scale(matrix, 1, 2, 1);
+
+	let matrixLocation = gl.getUniformLocation(program, "u_matrix");
+	gl.uniformMatrix4fv(matrixLocation, false, matrix);
+
 	let primitiveType = gl.TRIANGLES;
 	let offset2 = 0;
 	let count = 3;
