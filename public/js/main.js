@@ -1,86 +1,62 @@
-import { vertexShaderSource, fragmentShaderSource } from './shaders.js';
-import createShader from './gl/createShader.js';
-import createProgram from './gl/createProgram.js';
-import mat4 from './matrix/mat4.js';
-
 export default () => {
-	const canvas = document.getElementById('canvas');
+	// create a scene
+	let scene = new THREE.Scene();
+	let renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.domElement);
 
-	// get A WebGL context
-	let gl = canvas.getContext('webgl2');
+	// create the camera
+	let cameraHeight = 60;
+	let cameraRotation = 45;
+	let camera = new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -5000, 5000);
+	scene.add(camera);
 
-	// create shaders and program
-	const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-	const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-	const program = createProgram(gl, vertexShader, fragmentShader);
+	// create cubes
+	let geometry = new THREE.BoxGeometry(50, 50, 50);
+	let material = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+	let cube = new THREE.Mesh(geometry, material);
+	cube.position.set(0, 0, 0);
+	scene.add(cube);
+	let material2 = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+	let cube2 = new THREE.Mesh(geometry, material2);
+	cube2.position.set(60, 0, 0);
+	scene.add(cube2);
+	let material3 = new THREE.MeshLambertMaterial({ color: 0x0000ff });
+	let cube3 = new THREE.Mesh(geometry, material3);
+	cube3.position.set(0, 0, 60);
+	scene.add(cube3);
+	let material4 = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+	let cube4 = new THREE.Mesh(geometry, material4);
+	cube4.position.set(0, 60, 0);
+	scene.add(cube4);
 
-	// do a bunch of webgl stuff
-	let positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-	let positionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-	let positions = [
-		0, 0,
-		0, 100,
-		140, 0
+	// create a light for each axis direction
+	let lights = [
+		1, 0, 0,	0.70,
+		-1, 0, 0,	0.70,
+		0, 1, 0,	1.00,
+		0, -1, 0,	0.40,
+		0, 0, 1,	0.85,
+		0, 0, -1,	0.55
 	];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-	let vao = gl.createVertexArray();
-	gl.bindVertexArray(vao);
-	gl.enableVertexAttribArray(positionAttributeLocation);
-	var size = 2;          // 2 components per iteration
-	let type = gl.FLOAT;   // the data is 32bit floats
-	let normalize = false; // don't normalize the data
-	let stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-	let offset = 0;        // start at the beginning of the buffer
-	gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
-	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-	gl.clearColor(0, 0, 0, 0);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.useProgram(program);
-	gl.bindVertexArray(vao);
-	gl.enable(gl.CULL_FACE);
-	gl.enable(gl.DEPTH_TEST);
-
-	let matrix = mat4.ortho(0, gl.canvas.clientWidth, gl.canvas.clientHeight, 0, 400, -400);
-	// matrix = mat4.translate(matrix, 10, 0, 0);
-	// matrix = mat4.rotateX(matrix, 0);
-	// matrix = mat4.rotateY(matrix, 0);
-	// matrix = mat4.rotateZ(matrix, 0);
-	// matrix = mat4.scale(matrix, 1, 2, 1);
-
-	let matrixLocation = gl.getUniformLocation(program, "u_matrix");
-	gl.uniformMatrix4fv(matrixLocation, false, matrix);
-
-	let primitiveType = gl.TRIANGLES;
-	let offset2 = 0;
-	let count = 3;
-	gl.drawArrays(primitiveType, offset2, count);
-
-	// keep track of when the window has been resized
-	// resizeCanvas();
-	// let windowResized = false;
-	// window.addEventListener('resize', () => {
-	// 	windowResized = true;
-	// });
-
-	// function resizeCanvas() {
-	// 	canvas.width = window.innerWidth;
-	// 	canvas.height = window.innerHeight - 10;
-	// 	gl.viewport(0, 0, canvas.width, canvas.height);
-	// }
+	for (let i = 0; i < lights.length; i += 4) {
+		let light = new THREE.DirectionalLight(0xffffff, lights[i + 3]);
+		light.position.set(lights[i], lights[i + 1], lights[i + 2]);
+		scene.add(light);
+	}
 
 	// set up a render loop
-	function loop(timeNow) {
-		// // resize the canvas to match the window
-		// if (windowResized) {
-		// 	windowResized = false;
-		// 	resizeCanvas();
-		// }
+	function loop() {
+		// rotate the camera
+		// cameraRotation += 1;
+		camera.position.set(-100 * Math.sin(Math.PI * cameraRotation / 180), cameraHeight, 100 * Math.cos(Math.PI * cameraRotation / 180));
+		camera.lookAt(0, 0, 0);
 
 		// schedule the next loop
 		requestAnimationFrame(loop);
-	}
 
-	// kick off the render loop
-	requestAnimationFrame(loop);
+		// render the scene
+		renderer.render(scene, camera);
+	}
+	loop();
 };

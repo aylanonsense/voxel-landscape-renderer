@@ -6,14 +6,17 @@
 			body {
 				margin: 0;
 			}
+			canvas {
+				width: 100%; height: 100%
+			}
 		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
 		<script type="module">
 			import main from './js/main.js';
 			// run the main method once the DOM is loaded
 			window.addEventListener('load', main);
 		</script>
-	</head>
-	<body>
-		<canvas id="canvas" width="500" height="400"></canvas>
 	</body>
 </html>
