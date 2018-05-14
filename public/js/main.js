@@ -1,35 +1,62 @@
 export default () => {
 	const DEFAULT_DATA = `
-#ffdd44
-x = #f20
-. = rgb(100, 200, 0)
-f = blue
----
- x x xxx x
- x x  x  x
- xxx  x  x
- x x  x   
- x x xxx x
-...........
----
+// this is a comment!
+// let's choose our colors
+
+#ffdd44               // the background color
+# = #f20              // '#' means red
+g = rgb(100, 200, 0)  // '.' means green
+B = blue              // 'B' means blue
 
 
+// and now let's place our voxels
+// ('---' separates between layers)
 
-
-
-...........
 ---
 
 
 
 
-  f     f
- .........
+
+
+ggggggBBBgg
+---
+
+ # # ### #
+ # #  #  #
+ ###  #  #
+ # #  #   
+ # # ### #
+ggggggggBgg
+---
+
+
+
+
+
+
+ggggggggBgg
+---
+
+
+
+
+
+
+ gggggggBg 
+        B
+        B
+        B
+        B
+---
 `;
 
 	// create a scene
 	let container = document.getElementById('container');
 	let canvas = document.getElementById('canvas');
+	let textarea = document.getElementById('textarea');
+	let checkbox = document.getElementById('checkbox');
+	let button = document.getElementById('button');
 	let scene = new THREE.Scene();
 	let renderer = new THREE.WebGLRenderer({ canvas: canvas });
 	renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -39,6 +66,12 @@ f = blue
 	let cameraRotation = 0;
 	let camera = new THREE.OrthographicCamera(-container.offsetWidth / 2, container.offsetWidth / 2, container.offsetHeight / 2, -container.offsetHeight / 2, -5000, 5000);
 	scene.add(camera);
+
+	function setCameraRotation(r) {
+		cameraRotation = r;
+		camera.position.set(-100 * Math.sin(Math.PI * cameraRotation / 180), cameraHeight, 100 * Math.cos(Math.PI * cameraRotation / 180));
+		camera.lookAt(0, 0, 0);
+	}
 
 	// create a light for each axis direction
 	let lights = [
@@ -57,14 +90,16 @@ f = blue
 
 	// set up a render loop
 	function loop() {
-		// rotate the camera
-		cameraRotation += 0.4;
-		camera.position.set(-100 * Math.sin(Math.PI * cameraRotation / 180), cameraHeight, 100 * Math.cos(Math.PI * cameraRotation / 180));
-		camera.lookAt(0, 0, 0);
 		// schedule the next loop
 		requestAnimationFrame(loop);
-		// render the scene
-		renderer.render(scene, camera);
+		if (checkbox.checked) {
+			// rotate the camera
+			cameraRotation += 0.4;
+			camera.position.set(-100 * Math.sin(Math.PI * cameraRotation / 180), cameraHeight, 100 * Math.cos(Math.PI * cameraRotation / 180));
+			camera.lookAt(0, 0, 0);
+			// render the scene
+			renderer.render(scene, camera);
+		}
 	}
 	loop();
 
@@ -90,9 +125,17 @@ f = blue
 		let backgroundColor = '#000000';
 		let colors = {};
 		let blocks = {};
+		// remove all meshes
+		console.log(`Removing all existing voxels`);
+		for (let i = scene.children.length - 1; i >= 0; i--) {
+			if (scene.children[i].type === "Mesh") {
+				scene.remove(scene.children[i]);
+			}
+		}
 		// parse the input
 		console.log(`Parsing ${lines.length} lines of input`);
 		for(let line of lines) {
+			line = line.split('//')[0];
 			if (line.trim() === '---') {
 				if (!parsedColorDefinitions) {
 					parsedColorDefinitions = true;
@@ -107,7 +150,9 @@ f = blue
 				let parts = line.split('=');
 				// bg color definition
 				if (parts.length < 2) {
-					backgroundColor = parts[0].trim();
+					if (line.trim().length > 2) {
+						backgroundColor = parts[0].trim();
+					}
 				}
 				// material color definition
 				else if (line.trim().length > 0) {
@@ -167,7 +212,15 @@ f = blue
 		}
 		renderer.setClearColor(backgroundColor, 1);
 		console.log('Done!');
+		// render the scene
+		setCameraRotation(20);
+		renderer.render(scene, camera);
 	}
 
+	textarea.value = DEFAULT_DATA;
 	parseInput(DEFAULT_DATA);
+
+	button.addEventListener('click', () => {
+		parseInput(textarea.value);
+	});
 };
