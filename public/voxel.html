@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Voxel Landscape Renderer</title>
+		<style>
+			html, body {
+				height: 100%;
+				margin: 0px;
+				padding: 0px;
+			}
+			#wrapper {
+				display: flex;
+				height: 100%;
+			}
+			#container {
+				flex-grow: 1;
+				height: 100%;
+			}
+			#controls {
+				display: flex;
+				flex-direction: column;
+				width: 350px;
+				height: 100%;
+				border-left: 1px solid #ccc;
+			}
+			#textarea {
+				padding: 10px;
+				width: 330px;
+				flex-grow: 1;
+				border: none;
+				font-family: monospace;
+				white-space: nowrap;
+				overflow: auto;
+				resize: none;
+			}
+			#button {
+				height: 50px;
+				font-size: 18pt;
+			}
+			#checkbox-area {
+				border-top: 1px solid #ccc;
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="container">
+				<canvas id="canvas"></canvas>
+			</div>
+			<div id="controls">
+				<textarea id="textarea" wrap="soft"></textarea>
+				<div id="checkbox-area">
+					<label><input id="checkbox" type="checkbox" checked="true"> Rotate voxel landscape</label>
+				</div>
+				<button id="button">Render</button>
+			</div>
+		</div>
+		<script src="js/three.js"></script>
+		<script type="module">
+			import main from './js/voxel.js';
+			// run the main method once the DOM is loaded
+			window.addEventListener('load', main);
+		</script>
+	</body>
+</html>

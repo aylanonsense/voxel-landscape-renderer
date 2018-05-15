@@ -51,20 +51,22 @@ ggggggggBgg
 ---
 `;
 
-	// create a scene
-	let container = document.getElementById('container');
-	let canvas = document.getElementById('canvas');
-	let textarea = document.getElementById('textarea');
-	let checkbox = document.getElementById('checkbox');
-	let button = document.getElementById('button');
-	let scene = new THREE.Scene();
-	let renderer = new THREE.WebGLRenderer({ canvas: canvas });
-	renderer.setSize(container.offsetWidth, container.offsetHeight);
+	// get the dom elements
+	const container = document.getElementById('container');
+	const canvas = document.getElementById('canvas');
+	const textarea = document.getElementById('textarea');
+	const checkbox = document.getElementById('checkbox');
+	const button = document.getElementById('button');
+
+	// create the scene
+	const scene = new THREE.Scene();
+	const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+	renderer.setSize(container.offsetWidth, (container.offsetHeight - 5));
 
 	// create the camera
 	let cameraHeight = 60;
 	let cameraRotation = 0;
-	let camera = new THREE.OrthographicCamera(-container.offsetWidth / 2, container.offsetWidth / 2, container.offsetHeight / 2, -container.offsetHeight / 2, -5000, 5000);
+	let camera = new THREE.OrthographicCamera(-container.offsetWidth / 2, container.offsetWidth / 2, (container.offsetHeight - 5) / 2, -(container.offsetHeight - 5) / 2, -5000, 5000);
 	scene.add(camera);
 
 	function setCameraRotation(r) {
@@ -105,11 +107,11 @@ ggggggggBgg
 
 	// resize the canvas as necessary
 	window.addEventListener('resize', function() {
-		renderer.setSize(container.offsetWidth, container.offsetHeight);
+		renderer.setSize(container.offsetWidth, (container.offsetHeight - 5));
 		camera.left = -container.offsetWidth / 2;
 		camera.right = container.offsetWidth / 2;
-		camera.top = container.offsetHeight / 2;
-		camera.bottom = -container.offsetHeight / 2;
+		camera.top = (container.offsetHeight - 5) / 2;
+		camera.bottom = -(container.offsetHeight - 5) / 2;
 		camera.updateProjectionMatrix();
 	});
 
@@ -124,7 +126,7 @@ ggggggggBgg
 		let z = 0;
 		let backgroundColor = '#000000';
 		let colors = {};
-		let blocks = {};
+		let voxels = {};
 		// remove all meshes
 		console.log(`Removing all existing voxels`);
 		for (let i = scene.children.length - 1; i >= 0; i--) {
@@ -159,17 +161,17 @@ ggggggggBgg
 					colors[parts[0].trim()] = parts[1].trim();
 				}
 			}
-			// block definitions
+			// voxel definitions
 			else {
 				for (let x = 0; x < line.length; x++) {
 					if (line[x] && line[x] !== ' ' && line[x] !== '\t') {
-						if (!blocks[x]) {
-							blocks[x] = {};
+						if (!voxels[x]) {
+							voxels[x] = {};
 						}
-						if (!blocks[x][y]) {
-							blocks[x][y] = {};
+						if (!voxels[x][y]) {
+							voxels[x][y] = {};
 						}
-						blocks[x][y][z] = line[x];
+						voxels[x][y][z] = line[x];
 						numVoxels += 1;
 					}
 				}
@@ -189,15 +191,15 @@ ggggggggBgg
 		// calculate cube size
 		let maxWidth = 1 * Math.max(width, depth);
 		let maxHeight = 0.65 * height + 0.3 * Math.max(width, depth);
-		let size = 0.7 * Math.min(container.offsetWidth / maxWidth, container.offsetHeight / maxHeight);
+		let size = 0.7 * Math.min(container.offsetWidth / maxWidth, (container.offsetHeight - 5) / maxHeight);
 		// create the meshes
 		let geometry = new THREE.BoxGeometry(size, size, size);
 		console.log(`Creating ${numVoxels} voxels within space ${width}x${height}x${depth}`);
 		for (let x = 0; x < width; x++) {
 			for (let y = 0; y < height; y++) {
 				for (let z = 0; z < depth; z++) {
-					if (blocks[x] && blocks[x][y] && blocks[x][y][z]) {
-						let symbol = blocks[x][y][z];
+					if (voxels[x] && voxels[x][y] && voxels[x][y][z]) {
+						let symbol = voxels[x][y][z];
 						if (!materials[symbol]) {
 							console.log(`Could not find color '${symbol}'!`);
 						}
